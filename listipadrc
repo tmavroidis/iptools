@@ -1,0 +1,18 @@
+             Pgm
+
+             DCLF       FILE(OBJDIP)
+             DSPOBJD    OBJ(*ALL) OBJTYPE(*DEVD) DETAIL(*FULL) +
+                          OUTPUT(*OUTFILE) OUTFILE(OBJDIP)
+
+             RUNSQL     SQL('Create Table lstdevipp  ( objname Char(15), +
+                          ipaddr Char(15))')
+             MONMSG     MSGID(SQL9010) EXEC(CLRPFM LSTDEVIPP)
+ READ:
+             RCVF
+             MONMSG     MSGID(CPF0864) EXEC(GOTO CMDLBL(EOF))
+             CALL       PGM(NTMTOOLS/lstDEVIPC) PARM(&ODOBNM)
+             monmsg     cpf9898
+             goto       read
+ EOF:
+             taatool/DSPDBF FILE(LSTDEVIPP)
+             EndPgm             
