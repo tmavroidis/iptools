@@ -1,0 +1,18 @@
+     D #PGMDS         SDS
+     D  @PGMNM           *PROC
+     D  @JOB                 244    253
+     D  @USER                254    263
+     D DEVDDS          DS          1024
+     D  IPADDR               877    891
+     C** Call the API to get the IP address
+     C*
+     C                   CALL      'QDCRDEVD'
+     C                   PARM                    DEVDDS
+     C                   PARM                    DEVDLG            4
+     C                   PARM      'DEVD0600'    DEVDFM            8
+     C                   PARM      @JOB          DEVDNM           10
+     C                   PARM                    DEVDER          256
+     C*
+     C** Load the IP Address
+     C*
+     C                   MOVEL(P)  IPADDR        @ADDR 
