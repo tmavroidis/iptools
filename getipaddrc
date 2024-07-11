@@ -1,0 +1,61 @@
+/* =============================================================== */
+/* = Program....... RtvIPAddrC = */
+/* = Description... Retrieve IP address of current device = */
+/* = --------------------------------------------------------- = */
+/* = CrtCLPgm Pgm( YourLib/RtvIPAddrC ) + = */
+/* = SrcFile( YourLib/YourSrcF ) = */
+/* =============================================================== */
+
+             Pgm
+
+/* --------------------------------------------------------------- */
+/* - Variable declarations - */
+/* --------------------------------------------------------------- */
+
+             Dcl        &RcvVar *Char ( 892 )
+             Dcl        &RcvVarLen *Char ( 4 ) ( X'0000037C' )
+             Dcl        &Format *Char ( 8 ) ( 'DEVD0600' )
+             Dcl        &DevD *Char ( 10 )
+             Dcl        &APIError *Char ( 8 ) ( X'0000000000000000' )
+             Dcl        &IPAddr *Char ( 15 )
+             Dcl        &MsgID *Char ( 7 )
+             Dcl        &MsgDta *Char ( 256 )
+             Dcl        &MsgF *Char ( 10 )
+             Dcl        &MsgFLib *Char ( 10 )
+
+/* --------------------------------------------------------------- */
+/* - Global error trap - */
+/* --------------------------------------------------------------- */
+
+             MonMsg     ( CPF0000 MCH0000 ) Exec( GoTo Error )
+
+/* --------------------------------------------------------------- */
+/* - Retrieve current device name and its dotted IP address - */
+/* --------------------------------------------------------------- */
+
+             RtvJobA    Job( &DevD )
+
+             Call       QDCRDEVD ( &RcvVar &RcvVarLen &Format &DevD +
+                          &APIError )
+
+             ChgVar     &IPAddr ( %Sst( &RcvVar 878 15 ) )
+             SNDPGMMSG  MSGID(USR4310) MSGF(USRMSG) MSGDTA(&ipaddr) +
+                          TOPGMQ(*EXT) MSGTYPE(*INFO)
+
+             Return
+
+/* --------------------------------------------------------------- */
+/* - Error handler (percolate error message to caller) - */
+/* --------------------------------------------------------------- */
+
+ Error:
+
+             RcvMsg     MsgType( *Excp ) Rmv(*No ) MsgDta( &MsgDta ) +
+                          MsgID( &MsgID ) MsgF( &MsgF ) MsgFLib( &MsgFLib )
+             MonMsg     ( CPF0000 MCH0000 )
+
+             SndPgmMsg  MsgID( &MsgID ) MsgF( &MsgFLib/&MsgF ) MsgDta( +
+                          &MsgDta ) MsgType( *Escape )
+             MonMsg     ( CPF0000 MCH0000 )
+
+             EndPgm 
